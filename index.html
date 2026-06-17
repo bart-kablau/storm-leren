@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Storm leert — al je oefen-apps</title>
+<meta name="description" content="Alle oefen-apps van Storm op één plek. Kies een vak en ga aan de slag.">
+<meta name="theme-color" content="#3D1B33">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23EA580C'/%3E%3Cpath d='M16 6l2.7 5.9 6.5.7-4.8 4.3 1.3 6.4L16 24l-5.7 3.3 1.3-6.4-4.8-4.3 6.5-.7z' fill='white'/%3E%3C/svg%3E">
+
+<style>
+  /* ── Fonts (gebundeld — zelfde als de apps, werkt offline) ─────────────── */
+  @font-face{font-family:"Fredoka";font-style:normal;font-weight:500;font-display:swap;src:url("assets/font/fredoka-500.woff2") format("woff2")}
+  @font-face{font-family:"Fredoka";font-style:normal;font-weight:600;font-display:swap;src:url("assets/font/fredoka-600.woff2") format("woff2")}
+  @font-face{font-family:"Fredoka";font-style:normal;font-weight:700;font-display:swap;src:url("assets/font/fredoka-700.woff2") format("woff2")}
+  @font-face{font-family:"Nunito";font-style:normal;font-weight:400;font-display:swap;src:url("assets/font/nunito-400.woff2") format("woff2")}
+  @font-face{font-family:"Nunito";font-style:normal;font-weight:600;font-display:swap;src:url("assets/font/nunito-600.woff2") format("woff2")}
+  @font-face{font-family:"Nunito";font-style:normal;font-weight:700;font-display:swap;src:url("assets/font/nunito-700.woff2") format("woff2")}
+  @font-face{font-family:"Nunito";font-style:normal;font-weight:800;font-display:swap;src:url("assets/font/nunito-800.woff2") format("woff2")}
+
+  /* ── Tokens (Storm leert design-systeem, zie DESIGN.md) ────────────────── */
+  :root{
+    --bg:oklch(0.975 0.006 340);
+    --surface:#fff;
+    --ink:oklch(0.26 0.05 345);
+    --ink-soft:oklch(0.44 0.05 345);
+    --brand:oklch(0.655 0.195 41);
+    --brand-bright:oklch(0.70 0.185 46);
+    --plum:oklch(0.36 0.10 345);
+    --plum-deep:oklch(0.28 0.08 345);
+    --gold:oklch(0.82 0.14 82);
+    --ok:oklch(0.66 0.13 165);
+
+    --line:oklch(0.90 0.012 345);
+    --shadow-sm:0 1px 2px oklch(0.28 0.08 345 / .06), 0 2px 8px oklch(0.28 0.08 345 / .05);
+    --shadow-lg:0 18px 40px -18px oklch(0.28 0.08 345 / .35), 0 4px 14px oklch(0.28 0.08 345 / .08);
+    --ease:cubic-bezier(0.16,1,0.3,1);
+
+    --z-base:1; --z-raised:10; --z-overlay:100;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:"Nunito",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:inherit;text-decoration:none}
+  h1,h2,p{margin:0}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(1.1rem,4vw,2.5rem)}
+
+  /* ── Hero ──────────────────────────────────────────────────────────────── */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    background:var(--plum-deep);
+    color:#fff;
+    border-radius:0 0 28px 28px;
+    padding-block:clamp(2.6rem,7vw,4.6rem) clamp(2.4rem,6vw,3.8rem);
+  }
+  .hero::before{ /* warme oranje gloed, on-brand accent — geen tekst-gradient */
+    content:"";position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(80% 120% at 88% -10%, oklch(0.655 0.195 41 / .55), transparent 60%),
+      radial-gradient(60% 90% at 8% 120%, oklch(0.36 0.10 345 / .85), transparent 55%);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;z-index:var(--z-base)}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:.5rem;
+    font-weight:700;font-size:.82rem;letter-spacing:.01em;
+    color:oklch(0.82 0.14 82);
+    background:oklch(1 0 0 / .10);
+    border:1px solid oklch(1 0 0 / .16);
+    padding:.32rem .7rem;border-radius:999px;
+    margin-bottom:1.15rem;
+  }
+  .eyebrow .star{font-size:.9em}
+  .wordmark{
+    font-family:"Fredoka",sans-serif;font-weight:700;
+    font-size:clamp(2.5rem,8vw,4.3rem);
+    line-height:.98;letter-spacing:-0.03em;
+    text-wrap:balance;
+    margin:0;
+  }
+  .wordmark .leert{color:oklch(0.70 0.185 46)}
+  .lede{
+    margin-top:1rem;max-width:34ch;
+    font-size:clamp(1.04rem,2.4vw,1.22rem);
+    color:oklch(0.92 0.02 345);font-weight:600;
+    text-wrap:pretty;
+  }
+  .meta{
+    margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.55rem .9rem;
+    font-size:.9rem;color:oklch(0.86 0.02 345);font-weight:600;
+  }
+  .meta b{color:#fff;font-weight:800}
+  .meta .dot{opacity:.45}
+
+  /* ── Tegels ────────────────────────────────────────────────────────────── */
+  main{padding-block:clamp(2rem,5vw,3.4rem) clamp(3rem,7vw,5rem)}
+
+  .grid{
+    display:grid;gap:clamp(.9rem,2.2vw,1.25rem);
+    grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  }
+
+  .tile{
+    position:relative;display:flex;flex-direction:column;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:1.4rem 1.4rem 1.25rem;
+    box-shadow:var(--shadow-sm);
+    transition:transform .26s var(--ease), box-shadow .26s var(--ease), border-color .26s var(--ease);
+    isolation:isolate;
+    min-height:200px;
+  }
+  .tile::after{ /* subtiel vak-getint randje bovenaan bij hover */
+    content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;
+    box-shadow:inset 0 3px 0 0 var(--accent);
+    opacity:0;transition:opacity .26s var(--ease);
+  }
+  .tile:hover,.tile:focus-visible{
+    transform:translateY(-5px);
+    box-shadow:var(--shadow-lg);
+    border-color:color-mix(in oklch, var(--accent) 45%, var(--line));
+    outline:none;
+  }
+  .tile:hover::after,.tile:focus-visible::after{opacity:1}
+  .tile:focus-visible{box-shadow:var(--shadow-lg),0 0 0 3px var(--bg),0 0 0 6px var(--accent)}
+
+  .medallion{
+    width:54px;height:54px;border-radius:16px;flex:none;
+    display:grid;place-items:center;color:#fff;
+    background:var(--accent);
+    box-shadow:0 8px 18px -8px var(--accent);
+    transition:transform .3s var(--ease);
+  }
+  .tile:hover .medallion{transform:rotate(-4deg) scale(1.06)}
+  .medallion svg{width:28px;height:28px;display:block}
+
+  .tile-head{display:flex;align-items:flex-start;gap:.9rem}
+  .tile-titles{flex:1;min-width:0;padding-top:.1rem}
+  .vak{font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.28rem;line-height:1.1;letter-spacing:-0.01em}
+  .hoofdstuk{font-weight:700;font-size:.9rem;color:var(--accent);margin-top:.15rem}
+  .desc{margin-top:.85rem;color:var(--ink-soft);font-size:.96rem;flex:1}
+
+  .tile-foot{
+    margin-top:1.1rem;padding-top:.9rem;border-top:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+    font-size:.82rem;color:var(--ink-soft);font-weight:700;
+  }
+  .go{
+    display:inline-flex;align-items:center;gap:.35rem;
+    color:var(--brand);font-weight:800;
+  }
+  .go svg{width:17px;height:17px;transition:transform .26s var(--ease)}
+  .tile:hover .go svg{transform:translateX(4px)}
+
+  .pill{
+    position:absolute;top:1rem;right:1rem;z-index:var(--z-raised);
+    font-size:.7rem;font-weight:800;letter-spacing:.02em;
+    color:var(--plum-deep);background:var(--gold);
+    padding:.22rem .55rem;border-radius:999px;
+    box-shadow:0 2px 6px oklch(0.28 0.08 345 / .15);
+  }
+
+  /* Uitgelichte (nieuwste) tegel — breekt het raster, zet 'm bovenaan */
+  .tile.featured{grid-column:1 / -1}
+  @media (min-width:680px){
+    .tile.featured{
+      flex-direction:row;align-items:center;gap:clamp(1.2rem,4vw,2.4rem);
+      padding:clamp(1.5rem,3.5vw,2rem) clamp(1.6rem,4vw,2.4rem);
+      min-height:0;
+    }
+    .tile.featured .medallion{width:84px;height:84px;border-radius:22px}
+    .tile.featured .medallion svg{width:44px;height:44px}
+    .tile.featured .tile-body{flex:1;min-width:0}
+    .tile.featured .tile-head{align-items:center}
+    .tile.featured .vak{font-size:1.9rem}
+    .tile.featured .hoofdstuk{font-size:1rem}
+    .tile.featured .desc{margin-top:.45rem;font-size:1.05rem;max-width:52ch}
+    .tile.featured .tile-foot{
+      margin:0;padding:0;border:0;flex-direction:column;align-items:flex-end;gap:.5rem;flex:none;
+    }
+    .tile.featured .go{
+      font-size:1.02rem;background:var(--brand);color:#fff;
+      padding:.7rem 1.1rem;border-radius:14px;
+      box-shadow:0 10px 22px -10px var(--brand);
+    }
+    .tile.featured:hover .go{background:var(--brand-bright)}
+  }
+
+  /* Binnenkort-tegel */
+  .tile.soon{
+    background:transparent;border-style:dashed;box-shadow:none;
+    color:var(--ink-soft);cursor:default;
+  }
+  .tile.soon:hover{transform:none;box-shadow:none;border-color:var(--line)}
+  .tile.soon .medallion{background:oklch(0.90 0.012 345);color:var(--ink-soft);box-shadow:none}
+  .tile.soon .pill{background:oklch(0.90 0.012 345);color:var(--ink-soft);box-shadow:none}
+  .tile.soon .hoofdstuk{color:var(--ink-soft)}
+
+  /* ── Footer ────────────────────────────────────────────────────────────── */
+  .foot{
+    text-align:center;color:var(--ink-soft);font-size:.88rem;
+    padding-block:.5rem 2.5rem;
+  }
+  .foot .heart{color:var(--brand)}
+
+  /* ── Motion — entree verrijkt een al-zichtbare default ─────────────────── */
+  @media (prefers-reduced-motion: no-preference){
+    .reveal{opacity:0;transform:translateY(14px);animation:rise .6s var(--ease) forwards;animation-delay:var(--d,0ms)}
+    @keyframes rise{to{opacity:1;transform:none}}
+  }
+
+  @media (max-width:430px){
+    .tile{min-height:0}
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="wrap">
+      <span class="eyebrow reveal"><span class="star">★</span> Oefenen op jouw tempo</span>
+      <h1 class="wordmark reveal" style="--d:60ms">Storm <span class="leert">leert</span></h1>
+      <p class="lede reveal" style="--d:140ms">Al je oefen-apps op één plek. Kies een vak, oefen in kleine stapjes en zie je sterren groeien.</p>
+      <div class="meta reveal" style="--d:220ms">
+        <span><b id="count">…</b> vakken online</span>
+        <span class="dot">•</span>
+        <span>werkt op laptop, tablet en telefoon</span>
+        <span class="dot">•</span>
+        <span>nieuwste staat bovenaan</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid" id="grid"></div>
+    <noscript><p style="text-align:center;margin-top:2rem;color:var(--ink-soft)">Zet JavaScript aan om de apps te zien — of ga direct naar <a href="https://bart-kablau.github.io/storm-wiskunde/">de apps</a>.</p></noscript>
+  </main>
+
+  <footer class="foot">Gemaakt met <span class="heart">♥</span> voor Storm</footer>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────────
+   NIEUWE APP TOEVOEGEN?  Voeg hieronder één regel toe aan APPS.
+   - toegevoegd : ISO-datum/tijd; nieuwste komt automatisch bovenaan (uitgelicht).
+   - 'Nieuw'-label verschijnt vanzelf de eerste ~3 weken en verdwijnt daarna.
+   - icon       : key uit ICONS hieronder (of voeg een nieuwe SVG toe).
+   Daarna: vanuit /hub  →  node build/deploy-ghpages.mjs  (zet 'm live).
+   ───────────────────────────────────────────────────────────────────────── */
+const APPS = [
+  { vak:"Nederlands",     hoofdstuk:"Grammatica-gids",      icon:"nederlands",     accent:"oklch(0.60 0.13 70)",
+    url:"https://bart-kablau.github.io/storm-nederlands/",   toegevoegd:"2026-06-17T22:36",
+    desc:"Woordsoorten en zinsdelen ontrafelen — met uitleg die het écht uitlegt." },
+
+  { vak:"Aardrijkskunde", hoofdstuk:"De aarde in beweging", icon:"aardrijkskunde", accent:"oklch(0.56 0.12 162)",
+    url:"https://bart-kablau.github.io/storm-aardrijkskunde/", toegevoegd:"2026-06-17T22:14",
+    desc:"Platen, vulkanen en aardbevingen: hoe de aarde onder je voeten beweegt." },
+
+  { vak:"Frans",          hoofdstuk:"Chapitre 5 — Quel weekend", icon:"frans",     accent:"oklch(0.55 0.14 248)",
+    url:"https://bart-kablau.github.io/storm-frans/",        toegevoegd:"2026-06-17T21:35",
+    desc:"Woorden en zinnen oefenen tot het Frans vanzelf komt." },
+
+  { vak:"Engels",         hoofdstuk:"All Right! — Unit 5 & 6", icon:"engels",      accent:"oklch(0.57 0.18 25)",
+    url:"https://bart-kablau.github.io/storm-engels/",       toegevoegd:"2026-06-17T21:34",
+    desc:"Woorden en grammatica in stapeltjes van 8, met audio die meeleest." },
+
+  { vak:"Wiskunde",       hoofdstuk:"H8 — Herleiden en machten", icon:"wiskunde",  accent:"oklch(0.52 0.13 264)",
+    url:"https://bart-kablau.github.io/storm-wiskunde/",     toegevoegd:"2026-06-17T21:34",
+    desc:"Herleiden, machten en de regels erachter — stap voor stap tot het zit." },
+];
+
+/* Apps die er nog aankomen (niet klikbaar). Leeg = niets tonen. */
+const BINNENKORT = [
+  { vak:"Biologie", hoofdstuk:"In de maak", icon:"biologie", desc:"De volgende oefen-app is al onderweg." },
+];
+
+const ICONS = {
+  wiskunde:'<path d="M4 20V4M4 20h16" /><path d="M5.5 16.5C9 16.5 11 6.5 19 6" />',
+  aardrijkskunde:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 2.5 4.5 5.7 4.5 9S15 18.5 12 21c-3-2.5-4.5-5.7-4.5-9S9 5.5 12 3z"/>',
+  engels:'<path d="M20 11.5a7.5 7.5 0 0 1-10.4 6.9L4 20l1.6-4.6A7.5 7.5 0 1 1 20 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>',
+  frans:'<path d="M12 3l4.5 18M12 3L7.5 21M9.3 12h5.4M4 21h16"/>',
+  nederlands:'<path d="M15.5 4.5l4 4L9 19l-5 1 1-5z"/><path d="M13.5 6.5l4 4"/>',
+  biologie:'<path d="M7 4c0 4 10 4 10 8s-10 4-10 8M17 4c0 4-10 4-10 8s10 4 10 8M8 7h8M8 17h8"/>',
+};
+
+const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>';
+const ico = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]||""}</svg>`;
+
+const DAG = 86400000;
+const datumNL = iso => new Date(iso).toLocaleDateString("nl-NL",{day:"numeric",month:"long",year:"numeric"});
+const isNieuw = iso => (Date.now() - new Date(iso).getTime()) < 21*DAG;
+
+const sorted = [...APPS].sort((a,b)=> new Date(b.toegevoegd) - new Date(a.toegevoegd));
+document.getElementById("count").textContent = sorted.length;
+
+const grid = document.getElementById("grid");
+let i = 0;
+const card = (a, featured) => {
+  const el = document.createElement("a");
+  el.href = a.url;
+  el.className = "tile reveal" + (featured ? " featured" : "");
+  el.style.setProperty("--accent", a.accent);
+  el.style.setProperty("--d", (90 + i*70) + "ms"); i++;
+  el.setAttribute("aria-label", `${a.vak} — ${a.hoofdstuk}, open de oefen-app`);
+  el.innerHTML = `
+    ${isNieuw(a.toegevoegd) ? '<span class="pill">Nieuw</span>' : ''}
+    <div class="tile-body">
+      <div class="tile-head">
+        <div class="medallion">${ico(a.icon)}</div>
+        <div class="tile-titles">
+          <div class="vak">${a.vak}</div>
+          <div class="hoofdstuk">${a.hoofdstuk}</div>
+        </div>
+      </div>
+      <p class="desc">${a.desc}</p>
+    </div>
+    <div class="tile-foot">
+      <span>Toegevoegd ${datumNL(a.toegevoegd)}</span>
+      <span class="go">Openen ${arrow}</span>
+    </div>`;
+  return el;
+};
+
+sorted.forEach((a, idx) => grid.appendChild(card(a, idx === 0)));
+
+for (const b of BINNENKORT) {
+  const el = document.createElement("div");
+  el.className = "tile soon reveal";
+  el.style.setProperty("--accent", "oklch(0.55 0.02 200)");
+  el.style.setProperty("--d", (90 + i*70) + "ms"); i++;
+  el.innerHTML = `
+    <span class="pill">Binnenkort</span>
+    <div class="tile-body">
+      <div class="tile-head">
+        <div class="medallion">${ico(b.icon)}</div>
+        <div class="tile-titles">
+          <div class="vak">${b.vak}</div>
+          <div class="hoofdstuk">${b.hoofdstuk}</div>
+        </div>
+      </div>
+      <p class="desc">${b.desc}</p>
+    </div>`;
+  grid.appendChild(el);
+}
+</script>
+</body>
+</html>
