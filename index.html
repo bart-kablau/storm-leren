@@ -225,12 +225,44 @@
   @media (max-width:430px){
     .tile{min-height:0}
   }
+
+  /* ── Slimme AI-instelling ──────────────────────────────────────────────── */
+  .ai-btn{
+    position:absolute;top:clamp(1rem,3vw,1.6rem);right:0;z-index:var(--z-raised);
+    display:inline-flex;align-items:center;gap:.45rem;
+    font-family:inherit;font-weight:800;font-size:.84rem;color:#fff;cursor:pointer;
+    background:oklch(1 0 0 / .12);border:1px solid oklch(1 0 0 / .22);
+    padding:.42rem .82rem;border-radius:999px;transition:background .2s var(--ease);
+  }
+  .ai-btn:hover{background:oklch(1 0 0 / .2)}
+  .ai-btn .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px oklch(0.82 0.14 82 / .3);display:none}
+
+  .modal{position:fixed;inset:0;z-index:var(--z-overlay);display:none;place-items:center;padding:1.2rem;background:oklch(0.20 0.06 345 / .55)}
+  .modal.on{display:grid}
+  .sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px;max-width:440px;width:100%;padding:clamp(1.4rem,4vw,2rem);box-shadow:var(--shadow-lg);position:relative}
+  .sheet h2{font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.42rem;line-height:1.1;display:flex;align-items:center;gap:.5rem}
+  .sheet .sub{color:var(--ink-soft);font-size:.96rem;margin-top:.55rem;text-wrap:pretty}
+  .sheet label{display:block;font-weight:800;font-size:.85rem;margin:1.2rem 0 .35rem}
+  .sheet input{width:100%;padding:.72rem .85rem;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:var(--bg);color:var(--ink)}
+  .sheet input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in oklch,var(--brand) 22%,transparent)}
+  .note{font-size:.82rem;color:var(--ink-soft);margin-top:.55rem;line-height:1.5}
+  .note .linkx{color:var(--brand);font-weight:800}
+  .status{font-weight:800;font-size:.86rem;margin-top:1rem;padding:.55rem .75rem;border-radius:11px}
+  .status.on{background:oklch(0.66 0.13 165 / .14);color:oklch(0.40 0.13 165)}
+  .status.off{background:var(--bg);color:var(--ink-soft)}
+  .row{display:flex;gap:.6rem;margin-top:1.25rem}
+  .mbtn{font:inherit;font-weight:800;border:0;border-radius:13px;padding:.78rem 1.1rem;cursor:pointer}
+  .mbtn.primary{background:var(--brand);color:#fff;flex:1;box-shadow:0 10px 22px -12px var(--brand)}
+  .mbtn.primary:hover{background:var(--brand-bright)}
+  .mbtn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+  .xclose{position:absolute;top:.9rem;right:1rem;background:none;border:0;font-size:1.5rem;line-height:1;color:var(--ink-soft);cursor:pointer;padding:.2rem}
 </style>
 </head>
 <body>
 
   <header class="hero">
     <div class="wrap">
+      <button class="ai-btn" id="ai-open" aria-label="Slimme AI-instellingen"><span class="dot" id="ai-dot"></span><span id="ai-btn-txt">⚙️ Slimme AI</span></button>
       <span class="eyebrow reveal"><span class="star">★</span> Oefenen op jouw tempo</span>
       <h1 class="wordmark reveal" style="--d:60ms">Storm <span class="leert">leert</span></h1>
       <p class="lede reveal" style="--d:140ms">Al je oefen-apps op één plek. Kies een vak, oefen in kleine stapjes en zie je sterren groeien.</p>
@@ -250,6 +282,57 @@
   </main>
 
   <footer class="foot">Gemaakt met <span class="heart">♥</span> voor Storm</footer>
+
+  <!-- Slimme AI-instelling: zet de OpenRouter-sleutel één keer; alle oefen-apps op dit apparaat gebruiken 'm -->
+  <div class="modal" id="ai-modal" role="dialog" aria-modal="true" aria-labelledby="ai-title">
+    <div class="sheet">
+      <button class="xclose" id="ai-cancel" aria-label="Sluiten">×</button>
+      <h2 id="ai-title">✨ Slimme AI</h2>
+      <p class="sub">Slimme tips, advies en het <b>nakijken van je open antwoorden</b>. Zet je OpenRouter-sleutel hier één keer — hij werkt dan meteen in <b>al je oefen-apps</b> (wiskunde, biologie, aardrijkskunde …) op dit apparaat.</p>
+      <label for="ai-key">OpenRouter API-sleutel</label>
+      <input id="ai-key" type="password" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false">
+      <p class="note">🔒 De sleutel blijft <b>alleen op dit apparaat</b> (in je browser) — niet in de app of online opgeslagen. Een sleutel maken kan op <a class="linkx" href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.</p>
+      <div class="status off" id="ai-status"></div>
+      <div class="row">
+        <button class="mbtn primary" id="ai-save">Opslaan &amp; aanzetten</button>
+        <button class="mbtn ghost" id="ai-off">Uitzetten</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Slimme AI: deelt localStorage 'storm_judge' met alle oefen-apps (zelfde domein bart-kablau.github.io). */
+(function(){
+  const STORE="storm_judge";
+  const cfg =()=>{ try{ return JSON.parse(localStorage.getItem(STORE)||"{}"); }catch(e){ return {}; } };
+  const save=c =>{ try{ localStorage.setItem(STORE, JSON.stringify(c)); }catch(e){} };
+  const $=id=>document.getElementById(id);
+  function refresh(){
+    const c=cfg(), on=!!(c.aan && c.key);
+    $("ai-dot").style.display = on ? "inline-block" : "none";
+    $("ai-btn-txt").textContent = on ? "Slimme AI: aan" : "⚙️ Slimme AI";
+    const st=$("ai-status");
+    st.className = "status " + (on ? "on" : "off");
+    st.textContent = on
+      ? "✓ Staat aan — werkt in al je oefen-apps op dit apparaat."
+      : "Staat uit — open vragen worden lokaal nagekeken (zonder AI).";
+  }
+  function open(){ $("ai-key").value = cfg().key || ""; refresh(); $("ai-modal").classList.add("on"); setTimeout(()=>$("ai-key").focus(),60); }
+  function close(){ $("ai-modal").classList.remove("on"); }
+  $("ai-open").onclick = open;
+  $("ai-cancel").onclick = close;
+  $("ai-modal").onclick = e => { if(e.target.id==="ai-modal") close(); };
+  document.addEventListener("keydown", e => { if(e.key==="Escape") close(); });
+  $("ai-save").onclick = () => {
+    const key = $("ai-key").value.trim();
+    if(!key){ close(); return; }
+    save({ provider:"openrouter", key, aan:true });
+    refresh(); close();
+  };
+  $("ai-off").onclick = () => { const c=cfg(); c.aan=false; save(c); refresh(); };
+  refresh();
+})();
+</script>
 
 <script>
 /* ─────────────────────────────────────────────────────────────────────────
