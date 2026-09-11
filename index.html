@@ -263,7 +263,7 @@
    onzichtbaar zonder harde refresh. version.json halen we met no-store op (gaat langs de
    cache); is er een nieuwere build, dan herladen we eenmalig onder ?v=<build>. */
 (function(){
-  var BUILD = "2ac30b025d";          // wordt bij deploy vervangen door de echte build-hash
+  var BUILD = "dd8e2d1080";          // wordt bij deploy vervangen door de echte build-hash
   if(BUILD === "dev") return;
   try{
     var hier = new URL(location.href);
@@ -366,6 +366,10 @@
    Daarna: vanuit /hub  →  node build/deploy-ghpages.mjs  (zet 'm live).
    ───────────────────────────────────────────────────────────────────────── */
 const APPS = [
+  { vak:"Biologie",       hoofdstuk:"Thema 5 — Erfelijkheid", icon:"biologie", accent:"oklch(0.60 0.15 145)",
+    url:"https://bart-kablau.github.io/storm-biologie-erfelijkheid/", toegevoegd:"2026-09-11T13:30",
+    desc:"Genotype, chromosomen, DNA en mutaties — met vijf podcasts en een ronde tegen de bekendste instinkers." },
+
   { vak:"Duits",          hoofdstuk:"Kapitel 1 — Sich vorstellen", icon:"duits",     accent:"oklch(0.58 0.14 55)",
     url:"https://bart-kablau.github.io/storm-duits/",        toegevoegd:"2026-09-11T11:00",
     desc:"Je eerste Duits: jezelf voorstellen, tellen tot 20 en der/die/das — met de W-kaart tegen de wie/wer-val." },
