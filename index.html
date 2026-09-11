@@ -257,6 +257,29 @@
   .mbtn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
   .xclose{position:absolute;top:.9rem;right:1rem;background:none;border:0;font-size:1.5rem;line-height:1;color:var(--ink-soft);cursor:pointer;padding:.2rem}
 </style>
+<script>
+/* Cache-buster — zie tools/oefen-engine/stamp-build.mjs.
+   GitHub Pages stuurt max-age=600 op alles, dus een verse deploy blijft tot 10 minuten
+   onzichtbaar zonder harde refresh. version.json halen we met no-store op (gaat langs de
+   cache); is er een nieuwere build, dan herladen we eenmalig onder ?v=<build>. */
+(function(){
+  var BUILD = "2ac30b025d";          // wordt bij deploy vervangen door de echte build-hash
+  if(BUILD === "dev") return;
+  try{
+    var hier = new URL(location.href);
+    if(hier.protocol === "file:") return;
+    fetch("version.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(v){
+        if(!v || !v.build || v.build === BUILD) return;
+        if(hier.searchParams.get("v") === v.build) return;
+        hier.searchParams.set("v", v.build);
+        location.replace(hier.toString());
+      })
+      .catch(function(){});
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
