@@ -263,7 +263,7 @@
    onzichtbaar zonder harde refresh. version.json halen we met no-store op (gaat langs de
    cache); is er een nieuwere build, dan herladen we eenmalig onder ?v=<build>. */
 (function(){
-  var BUILD = "f0bfefea49";          // wordt bij deploy vervangen door de echte build-hash
+  var BUILD = "3dfb089c88";          // wordt bij deploy vervangen door de echte build-hash
   if(BUILD === "dev") return;
   try{
     var hier = new URL(location.href);
@@ -366,6 +366,10 @@
    Daarna: vanuit /hub  →  node build/deploy-ghpages.mjs  (zet 'm live).
    ───────────────────────────────────────────────────────────────────────── */
 const APPS = [
+  { vak:"Natuurkunde",    hoofdstuk:"H1 & H2 — Onderzoeken en dichtheid", icon:"natuurkunde", accent:"oklch(0.55 0.13 210)",
+    url:"https://bart-kablau.github.io/storm-natuurkunde/", toegevoegd:"2026-09-16T20:30",
+    desc:"Meten, eenheden omrekenen en de formule voor dichtheid — met maatcilinders die je echt afleest en de meetkaart tegen de vraag: grootheid of eenheid?" },
+
   { vak:"Geschiedenis",   hoofdstuk:"4.4 — Een onrustige opstand", icon:"geschiedenis", accent:"oklch(0.54 0.15 28)",
     url:"https://bart-kablau.github.io/storm-geschiedenis/", toegevoegd:"2026-09-16T20:05",
     desc:"Filips II, de Beeldenstorm en Alva: hoe ruzie over geloof en geld uitliep op een eigen land — met de oorzaak-gevolgkaart voor het SO." },
@@ -425,6 +429,7 @@ const ICONS = {
   duits:'<path d="M8.5 5.5h.01M15.5 5.5h.01"/><path d="M7.5 9v5.5a4.5 4.5 0 0 0 9 0V9"/>',
   levensvorm:'<path d="M3 21h18"/><path d="M6 21V10a6 6 0 0 1 12 0v11"/><path d="M12 21v-5"/>',
   geschiedenis:'<path d="M6 3h12M6 21h12"/><path d="M8 3v4c0 2.2 4 2.8 4 5s-4 2.8-4 5v4"/><path d="M16 3v4c0 2.2-4 2.8-4 5s4 2.8 4 5v4"/>',
+  natuurkunde:'<path d="M9 3h6"/><path d="M10 3v6.2L4.8 18A2 2 0 0 0 6.5 21h11a2 2 0 0 0 1.7-3L14 9.2V3"/><path d="M7.2 14h9.6"/>',
 };
 
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>';
