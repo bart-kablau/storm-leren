@@ -1,0 +1,19 @@
+{
+ "build": "725e32889e",
+ "appBytes": 189899,
+ "app": [
+  "assets/font/fredoka-500.woff2",
+  "assets/font/fredoka-600.woff2",
+  "assets/font/fredoka-700.woff2",
+  "assets/font/nunito-400.woff2",
+  "assets/font/nunito-600.woff2",
+  "assets/font/nunito-700.woff2",
+  "assets/font/nunito-800.woff2",
+  "assets/icon-192.png",
+  "assets/icon-512.png",
+  "index.html",
+  "manifest.webmanifest",
+  "offline.js"
+ ],
+ "media": []
+}

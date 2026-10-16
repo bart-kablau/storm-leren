@@ -7,6 +7,12 @@
 <meta name="description" content="Alle oefen-apps van Storm op één plek. Kies een vak en ga aan de slag.">
 <meta name="theme-color" content="#3D1B33">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23EA580C'/%3E%3Cpath d='M16 6l2.7 5.9 6.5.7-4.8 4.3 1.3 6.4L16 24l-5.7 3.3 1.3-6.4-4.8-4.3 6.5-.7z' fill='white'/%3E%3C/svg%3E">
+<!-- Op het beginscherm: de hub is één app voor de hele site (scope "/"), zie tools/oefen-engine/offline.mjs -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Storm leert">
 
 <style>
   /* ── Fonts (gebundeld — zelfde als de apps, werkt offline) ─────────────── */
@@ -237,6 +243,27 @@
   .ai-btn:hover{background:oklch(1 0 0 / .2)}
   .ai-btn .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px oklch(0.82 0.14 82 / .3);display:none}
 
+  .hero-knoppen{position:absolute;top:clamp(1rem,3vw,1.6rem);right:0;z-index:var(--z-raised);display:flex;gap:.45rem}
+  .hero-knoppen .ai-btn{position:static}
+  @media (max-width:600px){ .eyebrow{margin-top:2.7rem} }
+
+  /* ── Offline (vliegtuig) ───────────────────────────────────────────────── */
+  .sheet.off-sheet{max-width:520px;max-height:calc(100dvh - 2.4rem);overflow:auto}
+  .off-let{background:oklch(0.97 0.04 85);border:1px solid oklch(0.86 0.08 85);border-radius:12px;padding:.7rem .85rem;font-size:.88rem;line-height:1.45;margin-top:1rem}
+  .off-bar{height:10px;border-radius:6px;background:var(--bg);border:1px solid var(--line);overflow:hidden;margin-top:.8rem;display:none}
+  .off-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand-bright));transition:width .2s}
+  .off-vg{font-size:.82rem;color:var(--ink-soft);margin-top:.35rem;min-height:1.1em}
+  .off-app{display:flex;align-items:center;gap:.7rem;padding:.75rem .1rem;border-top:1px solid var(--line)}
+  .off-app:first-child{border-top:0}
+  .off-app .t{flex:1;min-width:0}
+  .off-app .t b{display:block;font-family:"Fredoka",sans-serif;font-weight:600}
+  .off-app .t small{color:var(--ink-soft);font-size:.82rem}
+  .off-app .mbtn{padding:.5rem .75rem;font-size:.85rem}
+  .off-app .weg{background:none;border:0;font-size:1.15rem;cursor:pointer;padding:.3rem}
+  .off-lijst{margin-top:1rem}
+  .off-uit{font-size:.86rem;margin-top:.8rem;line-height:1.5}
+  .pill.off-pill{left:auto;right:auto;background:oklch(0.66 0.13 165);color:#fff}
+
   .modal{position:fixed;inset:0;z-index:var(--z-overlay);display:none;place-items:center;padding:1.2rem;background:oklch(0.20 0.06 345 / .55)}
   .modal.on{display:grid}
   .sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px;max-width:440px;width:100%;padding:clamp(1.4rem,4vw,2rem);box-shadow:var(--shadow-lg);position:relative}
@@ -263,11 +290,13 @@
    onzichtbaar zonder harde refresh. version.json halen we met no-store op (gaat langs de
    cache); is er een nieuwere build, dan herladen we eenmalig onder ?v=<build>. */
 (function(){
-  var BUILD = "0c1af218c5";          // wordt bij deploy vervangen door de echte build-hash
+  var BUILD = "3b108eb38d";          // wordt bij deploy vervangen door de echte build-hash
   if(BUILD === "dev") return;
   try{
     var hier = new URL(location.href);
     if(hier.protocol === "file:") return;
+    /* hub offline geïnstalleerd: niet zelf herladen, het offline-scherm toont de update */
+    try{ if(localStorage.getItem("storm_offline:/storm-leren/")) return; }catch(e){}
     fetch("version.json?t=" + Date.now(), { cache: "no-store" })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(v){
@@ -285,7 +314,10 @@
 
   <header class="hero">
     <div class="wrap">
-      <button class="ai-btn" id="ai-open" aria-label="Slimme AI-instellingen"><span class="dot" id="ai-dot"></span><span id="ai-btn-txt">⚙️ Slimme AI</span></button>
+      <div class="hero-knoppen">
+        <button class="ai-btn" id="off-open" style="display:none" aria-label="Offline gebruiken"><span id="off-btn-txt">✈️ Offline</span></button>
+        <button class="ai-btn" id="ai-open" aria-label="Slimme AI-instellingen"><span class="dot" id="ai-dot"></span><span id="ai-btn-txt">⚙️ Slimme AI</span></button>
+      </div>
       <span class="eyebrow reveal"><span class="star">★</span> Oefenen op jouw tempo</span>
       <h1 class="wordmark reveal" style="--d:60ms">Storm <span class="leert">leert</span></h1>
       <p class="lede reveal" style="--d:140ms">Al je oefen-apps op één plek. Kies een vak, oefen in kleine stapjes en zie je sterren groeien.</p>
@@ -305,6 +337,26 @@
   </main>
 
   <footer class="foot">Gemaakt met <span class="heart">♥</span> voor Storm</footer>
+
+  <!-- Offline: apps (met films) downloaden voor in het vliegtuig. Alleen apps met offline.json. -->
+  <div class="modal" id="off-modal" role="dialog" aria-modal="true" aria-labelledby="off-title">
+    <div class="sheet off-sheet">
+      <button class="xclose" id="off-cancel" aria-label="Sluiten">×</button>
+      <h2 id="off-title">✈️ Offline gebruiken</h2>
+      <p class="sub">Download de vakken die je zonder internet wilt gebruiken, met hun films. Je sterren en voortgang blijven altijd bewaard.</p>
+      <div class="off-let" id="off-ios" style="display:none">📲 <b>Eerst op je beginscherm zetten.</b> Tik in Safari op <b>Deel</b> → <b>Zet op beginscherm</b> en open Storm leert daarna vanaf je beginscherm. Pas dan downloaden: wat je hier in Safari downloadt, ziet de beginscherm-app niet.</div>
+      <div class="status off" id="off-status">Even kijken…</div>
+      <div class="off-bar" id="off-bar"><i id="off-vul"></i></div>
+      <div class="off-vg" id="off-vg"></div>
+      <div class="row">
+        <button class="mbtn primary" id="off-alles">⬇ Alles downloaden</button>
+        <button class="mbtn ghost" id="off-check">✈️ Controleer</button>
+      </div>
+      <div class="off-uit" id="off-uit"></div>
+      <div class="off-lijst" id="off-lijst"></div>
+      <p class="note" id="off-opslag"></p>
+    </div>
+  </div>
 
   <!-- Slimme AI-instelling: zet de OpenRouter-sleutel één keer; alle oefen-apps op dit apparaat gebruiken 'm -->
   <div class="modal" id="ai-modal" role="dialog" aria-modal="true" aria-labelledby="ai-title">
@@ -495,6 +547,146 @@ for (const b of BINNENKORT) {
     </div>`;
   grid.appendChild(el);
 }
+</script>
+
+<script src="offline.js?v=3b108eb38d"></script>
+<script>
+/* ─────────────────────────────────────────────────────────────────────────
+   Offline (vliegtuig). De kern zit in offline.js (window.StormOffline, uit
+   tools/oefen-engine/offline/). De hub toont alleen apps die een offline.json
+   hebben (apps gedeployd met maakOffline); oudere apps vallen er vanzelf buiten.
+   Downloaden van een app neemt de hub zelf ook mee, zodat Storm vanaf het
+   beginscherm (scope "/") de vakken offline kan openen.
+   ───────────────────────────────────────────────────────────────────────── */
+(function(){
+  if(!window.StormOffline || !StormOffline.kan()) return;
+  const SO=StormOffline, $=id=>document.getElementById(id), mb=SO.mb;
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const HUB={ naam:"Startscherm", app:SO.app(SO.scopeVan(location.href)) };
+  let items=[], bezig=false;
+
+  const plan = it => it.app.plan(it.remote, it.state);
+  const lijstVan = it => it.remote || (it.state && it.state.lijst) || null;
+  function status(it){
+    const L=lijstVan(it), st=it.state||{}, lok=st.media||{}, p=plan(it);
+    if(!st.build && !Object.keys(lok).length) return "niet";
+    const alles = st.build && L && L.media.every(m=>lok[m.pad]);
+    if(p && (p.app || p.nieuw.length)) return "nieuw";
+    return alles && (!p || !p.media.length) ? "ok" : "deels";
+  }
+  async function vernieuwStaat(it){ it.state = await it.app.lees(); }
+
+  async function laad(){
+    const scopes = sorted.map(a=>({ a, app:SO.app(SO.scopeVan(a.url)) })).filter(x=>x.app.scope!==HUB.app.scope);
+    const [hr, hs] = await Promise.all([HUB.app.haalLijst(), HUB.app.lees()]); HUB.remote=hr; HUB.state=hs;
+    const res = await Promise.all(scopes.map(async x=>{ const [remote,state]=await Promise.all([x.app.haalLijst(), x.app.lees()]); return Object.assign(x,{remote,state}); }));
+    items = res.filter(x=>x.remote || x.state);
+    if(!items.length) return;
+    await SO.registreer();
+    $("off-open").style.display="inline-flex";
+    tegels();
+  }
+  function tegels(){
+    const ok=items.filter(it=>status(it)==="ok").length, nieuw=items.some(it=>status(it)==="nieuw") || (HUB.state && HUB.state.build && plan(HUB) && plan(HUB).app);
+    $("off-btn-txt").textContent = nieuw ? "✈️ Nieuwe versie" : (ok ? "✈️ Offline ✓" : "✈️ Offline");
+    /* zonder internet: tegels die niet offline staan grijs, zodat Storm weet wat werkt */
+    const offline = !HUB.remote && !items.some(it=>it.remote);
+    const okUrls = new Set(items.filter(it=>status(it)==="ok").map(it=>it.a.url));
+    document.querySelectorAll("a.tile").forEach(tile=>{
+      const t=tile.querySelector(".tile-foot span"); if(!t) return;
+      if(!t.dataset.org) t.dataset.org=t.textContent;
+      const ok=okUrls.has(tile.getAttribute("href"));
+      t.textContent = (ok ? "✈️ staat offline · " : (offline ? "📶 alleen met internet · " : "")) + t.dataset.org;
+      tile.style.opacity = offline && !ok ? ".5" : "";
+    });
+  }
+  function ios(){ return /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1); }
+  function standalone(){ return navigator.standalone===true || matchMedia("(display-mode: standalone)").matches; }
+
+  async function render(){
+    if(!bezig){ await vernieuwStaat(HUB); for(const it of items) await vernieuwStaat(it); }
+    $("off-ios").style.display = ios() && !standalone() ? "block" : "none";
+    const online = items.some(it=>it.remote);
+    const allesOk = items.every(it=>status(it)==="ok");
+    const teHalen = items.reduce((s,it)=>{ const p=plan(it); return s+(p?p.bytes:0); },0) + ((plan(HUB)||{}).bytes||0);
+    if(!bezig){
+      const st=$("off-status");
+      st.className="status "+(allesOk?"on":"off");
+      const hubNieuw = HUB.state && HUB.state.build && plan(HUB) && plan(HUB).app;
+      st.textContent = allesOk && !hubNieuw ? "✅ Alles staat offline. Klaar voor het vliegtuig!" : (allesOk && hubNieuw ? "🔄 Er is een nieuwe versie van het startscherm." : (online ? "Kies wat je offline wilt hebben." : "Geen internet: downloaden kan alleen online."));
+      if(hubNieuw) st.className="status off";
+      const b=$("off-alles"); b.disabled = !online || bezig || !teHalen; b.style.display = online && teHalen ? "" : "none";
+      b.textContent = (items.some(it=>it.state && it.state.build) ? "⬇ Alles bijwerken" : "⬇ Alles downloaden")+" ("+mb(teHalen)+")";
+      $("off-check").style.display = items.some(it=>it.state && it.state.build) ? "" : "none";
+    }
+    const box=$("off-lijst"); box.innerHTML="";
+    items.forEach(it=>{
+      const L=lijstVan(it), s=status(it), p=plan(it), tot=L ? (L.appBytes+L.media.reduce((a,m)=>a+m.bytes,0)) : 0;
+      const n=L ? L.media.length : 0;
+      const sub = { ok:"✓ staat offline", nieuw:"🔄 nieuwe versie", deels:"deels offline", niet:"nog niet offline" }[s] + " · " + mb(tot) + (n ? " · "+n+(n===1?" film":" films") : "");
+      const r=document.createElement("div"); r.className="off-app";
+      r.innerHTML='<div class="t"><b>'+esc(it.a.vak)+'</b><small>'+esc(it.a.hoofdstuk)+'</small><br><small>'+esc(sub)+'</small></div>';
+      if(it.remote && p && p.bytes){
+        const k=document.createElement("button"); k.className="mbtn primary"; k.style.flex="0 0 auto"; k.disabled=bezig;
+        k.textContent=(s==="nieuw"?"🔄 ":"⬇ ")+mb(p.bytes); k.onclick=()=>download([it]); r.appendChild(k);
+      }
+      if(it.state){ const w=document.createElement("button"); w.className="weg"; w.textContent="🗑"; w.setAttribute("aria-label","Weggooien"); w.onclick=()=>weg(it); r.appendChild(w); }
+      box.appendChild(r);
+    });
+    try{ const e=await navigator.storage.estimate(); $("off-opslag").textContent="Opslag van alle Storm-apps samen: "+mb(e.usage||0)+(e.quota?" (ruimte: ± "+(e.quota/1073741824).toFixed(1)+" GB)":"")+". Per vak vernieuwen of hard vernieuwen kan ook in de app zelf, bij ✈️ Offline gebruiken."; }catch(e){}
+  }
+
+  function vg(klaar, totaal, tekst){
+    $("off-bar").style.display="block";
+    $("off-vul").style.width=(totaal?Math.min(100,klaar/totaal*100):0).toFixed(1)+"%";
+    $("off-vg").textContent=tekst+" · "+mb(klaar)+" van "+mb(totaal);
+  }
+  async function download(lijst){
+    if(bezig) return; bezig=true;
+    $("off-status").className="status off"; $("off-status").textContent="⬇ Downloaden… laat dit scherm open";
+    render();
+    let hubNieuw=false;
+    try{
+      if(HUB.remote){
+        const u=await HUB.app.sync(HUB.remote,{ voortgang:(k,t)=>vg(k,t,"Startscherm") });
+        hubNieuw = u.appVernieuwd && u.oudBuild && u.oudBuild!==HUB.remote.build;
+      }
+      for(const it of lijst){
+        if(!it.remote) continue;
+        await it.app.sync(it.remote,{ voortgang:(k,t,x)=>vg(k,t,it.a.vak+" · "+x) });
+        await vernieuwStaat(it);
+      }
+      $("off-vg").textContent=""; $("off-bar").style.display="none";
+    }catch(e){
+      $("off-vg").textContent="⚠️ Gestopt: "+(e&&e.message||e)+". Wat al binnen was blijft staan; probeer het nog eens.";
+    }finally{ bezig=false; }
+    if(hubNieuw){ const u=new URL(location.href); u.searchParams.set("v",HUB.remote.build); location.replace(u.toString()); return; }
+    await render(); tegels();
+  }
+  async function weg(it){
+    if(!confirm(it.a.vak+" ("+it.a.hoofdstuk+") van deze telefoon weggooien? Je sterren en voortgang blijven bewaard.")) return;
+    await it.app.allesWeg(); await vernieuwStaat(it); render(); tegels();
+  }
+  async function check(){
+    const uit=$("off-uit"); uit.innerHTML="⏳ Controleren…";
+    const regels=[]; let allesGoed=true;
+    const h=await HUB.app.check(); if(h.fout.length){ allesGoed=false; regels.push("Startscherm: "+esc(h.fout[0])); }
+    for(const it of items){
+      if(!it.state || !it.state.build) continue;
+      const r=await it.app.check({ alleenAanwezig:true });
+      if(r.fout.length) allesGoed=false;
+      regels.push((r.fout.length?"⚠️ ":"✅ ")+esc(it.a.vak)+": app "+r.appOk+"/"+r.appN+", films "+r.mediaOk+"/"+r.mediaN+(r.fout.length?' <span style="color:var(--brand)">('+esc(r.fout.slice(0,3).join("; "))+')</span>':""));
+    }
+    uit.innerHTML=(allesGoed?"<b>✅ Klaar voor vertrek! ✈️</b><br>":"")+regels.join("<br>");
+  }
+
+  $("off-open").onclick=()=>{ $("off-modal").classList.add("on"); render(); };
+  $("off-cancel").onclick=()=>{ if(!bezig) $("off-modal").classList.remove("on"); };
+  $("off-modal").onclick=e=>{ if(e.target.id==="off-modal" && !bezig) $("off-modal").classList.remove("on"); };
+  $("off-alles").onclick=()=>download(items);
+  $("off-check").onclick=check;
+  laad();
+})();
 </script>
 </body>
 </html>
