@@ -290,7 +290,7 @@
    onzichtbaar zonder harde refresh. version.json halen we met no-store op (gaat langs de
    cache); is er een nieuwere build, dan herladen we eenmalig onder ?v=<build>. */
 (function(){
-  var BUILD = "3b108eb38d";          // wordt bij deploy vervangen door de echte build-hash
+  var BUILD = "d8d19894ff";          // wordt bij deploy vervangen door de echte build-hash
   if(BUILD === "dev") return;
   try{
     var hier = new URL(location.href);
@@ -418,13 +418,15 @@
    Daarna: vanuit /hub  →  node build/deploy-ghpages.mjs  (zet 'm live).
    ───────────────────────────────────────────────────────────────────────── */
 const APPS = [
+  { vak:"Natuurkunde",   hoofdstuk:"Toetsweek 1: H1, H2 en H4 Elektriciteit", icon:"natuurkunde", accent:"oklch(0.55 0.13 210)",
+    url:"https://bart-kablau.github.io/storm-natuurkunde-tw1/", toegevoegd:"2026-10-16T23:00",
+    desc:"Alle leerdoelen van je kaart: 12 tekenfilms, een speelles waarin je zelf stroomkringen bouwt, en oefenen met meters, dichtheid en schakelschema's." },
+
   { vak:"Biologie",       hoofdstuk:"Thema 5 & 6 — Erfelijkheid en Ecologie", icon:"biologie", accent:"oklch(0.60 0.15 145)",
     url:"https://bart-kablau.github.io/storm-biologie-t5t6/", toegevoegd:"2026-10-16T07:00",
     desc:"Alle 69 begrippen van je lijst: 16 tekenfilms (van één konijn tot de hele aarde, van cel tot DNA), een speelles en oefenen tot je ze kent." },
 
-  { vak:"Natuurkunde",   hoofdstuk:"H1 & H2 — Onderzoeken en dichtheid", icon:"natuurkunde", accent:"oklch(0.55 0.13 210)",
-    url:"https://bart-kablau.github.io/storm-natuurkunde/", toegevoegd:"2026-09-16T20:30",
-    desc:"Meten, eenheden omrekenen en de formule voor dichtheid — met maatcilinders die je echt afleest en de meetkaart tegen de vraag: grootheid of eenheid?" },
+  /* De oude H1 & H2-app (storm-natuurkunde) blijft live, maar heeft geen tegel meer: TW1 hieronder dekt alles. */
 
   { vak:"Geschiedenis",   hoofdstuk:"4.4 — Een onrustige opstand", icon:"geschiedenis", accent:"oklch(0.54 0.15 28)",
     url:"https://bart-kablau.github.io/storm-geschiedenis/", toegevoegd:"2026-09-16T20:05",
@@ -549,7 +551,7 @@ for (const b of BINNENKORT) {
 }
 </script>
 
-<script src="offline.js?v=3b108eb38d"></script>
+<script src="offline.js?v=d8d19894ff"></script>
 <script>
 /* ─────────────────────────────────────────────────────────────────────────
    Offline (vliegtuig). De kern zit in offline.js (window.StormOffline, uit
