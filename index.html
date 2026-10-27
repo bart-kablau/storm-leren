@@ -290,7 +290,7 @@
    onzichtbaar zonder harde refresh. version.json halen we met no-store op (gaat langs de
    cache); is er een nieuwere build, dan herladen we eenmalig onder ?v=<build>. */
 (function(){
-  var BUILD = "cf9c6eb70e";          // wordt bij deploy vervangen door de echte build-hash
+  var BUILD = "83a054e367";          // wordt bij deploy vervangen door de echte build-hash
   if(BUILD === "dev") return;
   try{
     var hier = new URL(location.href);
@@ -418,6 +418,10 @@
    Daarna: vanuit /hub  →  node build/deploy-ghpages.mjs  (zet 'm live).
    ───────────────────────────────────────────────────────────────────────── */
 const APPS = [
+  { vak:"Wiskunde",       hoofdstuk:"H2 Afstand en oppervlakte", icon:"wiskunde", accent:"oklch(0.52 0.13 264)",
+    url:"https://bart-kablau.github.io/storm-wiskunde-h2/", toegevoegd:"2026-10-28T01:00",
+    desc:"Per paragraaf een eigen gebied: vlieg reddingsmissies met de traumahelikopter (cirkels, middelloodlijn, bissectrice, hoogtelijn) en knip stof in Het Atelier (oppervlakte). Zelf slepen en meten, met films en oefenen per paragraaf." },
+
   { vak:"Nederlands",     hoofdstuk:"Lezen 1 t/m 3", icon:"nederlands", accent:"oklch(0.60 0.13 70)",
     url:"https://bart-kablau.github.io/storm-nederlands-lezen/", toegevoegd:"2026-10-17T01:00",
     desc:"Tekstgeraamte, leesmanieren, verwijswoorden en alle elf signaalwoord-verbanden: 8 tekenfilms, een speelles door de tekststad met Bo, en oefenen tot oorzaak en reden nooit meer door elkaar lopen." },
@@ -557,7 +561,7 @@ for (const b of BINNENKORT) {
 }
 </script>
 
-<script src="offline.js?v=cf9c6eb70e"></script>
+<script src="offline.js?v=83a054e367"></script>
 <script>
 /* ─────────────────────────────────────────────────────────────────────────
    Offline (vliegtuig). De kern zit in offline.js (window.StormOffline, uit
